@@ -3,3 +3,6 @@ Data/
 *.log
 .vscode/
 .DS_Store
+*.swp
+*.o
+main

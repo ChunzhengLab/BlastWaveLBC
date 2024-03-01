@@ -48,6 +48,11 @@ namespace par
     return phib;
   }
 
+  const float TScale = 1.0;
+  const float BetaScale = 0.;
+  const float Rho2Scale = 0.5;
+  const float FracLBC[] = {0.0348, 0.0372, 0.0375, 0.0480, 0.0580};
+
   float PtHistMax = 10.;
   float PtHistMin = 0.;
   int nPtBins = 100;

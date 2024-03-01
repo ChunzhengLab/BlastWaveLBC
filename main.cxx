@@ -10,6 +10,7 @@
 #include "TFile.h"
 #include "TGraph.h"
 #include "TSpline.h"
+#include "TStopwatch.h"
 
 #include "Particle.h"
 #include "Event.h"
@@ -18,7 +19,7 @@
 
 std::array<TF1*, 9> nbdFunctions;
 void InitializeNBDFunctions() {
-    for (size_t i = 0; i < nbdFunctions.size(); ++i) {
+    for (int i = 0; i < (int)nbdFunctions.size(); ++i) {
         if (!nbdFunctions[i]) {
             nbdFunctions[i] = new TF1(Form("NBD%i", i), nameNBD, NBDLow[i], NBDHigh[i]);
         }
@@ -55,22 +56,39 @@ unsigned int GetMultNBD(float centrality) {
 }
 
 int main(int argc, char* argv[]) {
+// int main(int argc, char* argv[]) {
+  TStopwatch timer;
+  timer.Start();
+  ///////////////////////////////////////////////////////////////////////////////////////////
   //读取参数 fTScale, fBetaScale, fRho2Scale, fLBC, fCentrality
-  if (argc < 5) {
-    cout << "Usage: ./main fTScale fBetaScale fRho2Scale fLBC fCentrality" << endl;
-    return 1;
-  }
+  // if (argc < 5) {
+  //   cout << "Usage: ./main fTScale fBetaScale fRho2Scale fLBC fCentrality" << endl;
+  //   return 1;
+  // }
+  // 将字符串参数转换为浮点数
+  // const float fTScale = std::stof(argv[1]);
+  // const float fBetaScale = std::stof(argv[2]);
+  // const float fRho2Scale = std::stof(argv[3]);
+  // const float fLBC = std::stof(argv[4]);
+  // const float fCentrality = std::stof(argv[5]);
+  ///////////////////////////////////////////////////////////////////////////////////////////
+
+  const float fCentrality = std::stof(argv[1]);
+  const float fTScale = TScale;
+  const float fBetaScale = BetaScale;
+  const float fRho2Scale = Rho2Scale;
+  float fLBC = 0.0;
+  int cent_ = (int) fCentrality;
+  //cent_ = 25 -> fLBC = FracLBC[0], cent_ = 35 -> fLBC = FracLBC[1], cent_ = 45 -> fLBC = FracLBC[2], 
+  if (cent_ == 25)      fLBC = FracLBC[0];
+  else if (cent_ == 35) fLBC = FracLBC[1];
+  else if (cent_ == 45) fLBC = FracLBC[2];
+  else if (cent_ == 55) fLBC = FracLBC[3];
+  else if (cent_ == 65) fLBC = FracLBC[4];
 
   cout<<"Start a new run"<<endl;
   // 初始化NBD函数
   InitializeNBDFunctions();
-
-  // 将字符串参数转换为浮点数
-  const float fTScale = std::stof(argv[1]);
-  const float fBetaScale = std::stof(argv[2]);
-  const float fRho2Scale = std::stof(argv[3]);
-  const float fLBC = std::stof(argv[4]);
-  const float fCentrality = std::stof(argv[5]);
 
   TH1D* h_pt_lambda = new TH1D("h_pt_lambda", "h_pt_lambda", nPtBins, PtHistMin, PtHistMax);
   TH1D* h_pt_proton = new TH1D("h_pt_proton", "h_pt_proton", nPtBins, PtHistMin, PtHistMax);
@@ -106,13 +124,12 @@ int main(int argc, char* argv[]) {
 
   if (isDebug) cout<<"Start generating events..."<<endl;
   for (unsigned int iEvent = 0; iEvent < nEvents; iEvent++) {
-    //显示生成进度，每200个事件显示一次
-    if (iEvent % 200 == 0) {
+    //显示生成进度，每100个事件显示一次
+    if (iEvent % 100 == 0) {
       cout << "Generating event " << iEvent << "..." << endl;
     }
     Event* event = new Event(fTScale, fBetaScale, fRho2Scale, fCentrality);
     unsigned int multiplicity = GetMultNBD(fCentrality);
-    cout<<"multiplicity = "<<multiplicity<<endl;
     event->SetMultiplicity(multiplicity);
     event->SetfLBC(fLBC);
     if (isDebug) {
@@ -152,7 +169,7 @@ int main(int argc, char* argv[]) {
     event = nullptr;
   }
 
-  TFile* f = new TFile(Form("result_cent_%f.root", fCentrality), "recreate");
+  TFile* f = new TFile(Form("result_cent_%i.root", cent_), "RECREATE");
   h_pt_lambda->Write();
   h_pt_proton->Write();
   p_v2_pt_lambda->Write();
@@ -177,6 +194,8 @@ int main(int argc, char* argv[]) {
   //cout << "Generating event TScale = " << fTScale << ", BetaScale = " << fBetaScale << ", Rho2Scale = " << fRho2Scale << ", Centrality = " << fCentrality << " finished." << endl;
   //cout << "Generating event fLBC = " << fLBC << ", Centrality = " << fCentrality << " finished." << endl;
   cout << "Generating event Centrality = " << fCentrality << " finished." << endl;
+  timer.Stop();
+  cout<< "the total time is "<<timer.RealTime()<<endl;
   return 0;
 }
 
