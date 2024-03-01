@@ -5,7 +5,7 @@ CXX = g++
 CXXFLAGS = -g -Wall $(shell root-config --cflags) -O3
 
 # 定义链接器标志，这里引入ROOT库，并添加 gperftools 的性能分析库 -lprofiler
-LDFLAGS = $(shell root-config --libs) -L/opt/homebrew/lib -lprofiler
+LDFLAGS = $(shell root-config --libs)
 
 # 定义目标可执行文件
 TARGET = main
