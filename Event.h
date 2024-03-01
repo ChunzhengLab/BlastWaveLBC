@@ -152,7 +152,7 @@ Event::~Event()
 void Event::GenerateParticles()
 {
   Reserve(multiplicity);
-  int iSerialNumber = 0;
+  unsigned int iSerialNumber = 0;
   //当iSerialNumber大于multiplicity时，停止循环
   while (iSerialNumber < multiplicity) {
     //粒子序列号

@@ -18,7 +18,7 @@
 
 std::array<TF1*, 9> nbdFunctions;
 void InitializeNBDFunctions() {
-    for (int i = 0; i < nbdFunctions.size(); ++i) {
+    for (size_t i = 0; i < nbdFunctions.size(); ++i) {
         if (!nbdFunctions[i]) {
             nbdFunctions[i] = new TF1(Form("NBD%i", i), nameNBD, NBDLow[i], NBDHigh[i]);
         }
