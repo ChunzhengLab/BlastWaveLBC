@@ -1,0 +1,5 @@
+Data/
+*.root
+*.log
+.vscode/
+.DS_Store
