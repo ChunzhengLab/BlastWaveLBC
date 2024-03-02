@@ -5,7 +5,9 @@ mkdir $jobDir
 cp main $jobDir
 cd $jobDir
 ./main 35
-mkdir -p ${pwd_}/testdata/cent35/${1}
-mv *.root ${pwd_}/testdata/cent35/${1}
-find /local/storage -user chunzheng -delete
+for file in *.root; do
+    mv "$file" "${file%.root}_${1}.root"
+done
+mkdir -p ${pwd_}/testdata/cent35
+mv *_${1}.root ${pwd_}/testdata/cent35
 rm -rf $jobDir

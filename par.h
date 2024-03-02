@@ -61,7 +61,7 @@ namespace par
   float V2HistMin = 0.2;
   int nV2Bins = 20;
 
-  unsigned int nEvents = 2000;
+  unsigned int nEvents = 1000;
   float ratioProtonLambda = 1.5;
   float ratioProtonInclusive = 5./120.;
   bool isDebug = false;
