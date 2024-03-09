@@ -64,6 +64,26 @@ private:
   // TProfile* p_deltaOS_lala_thisEvt;
   // TProfile* p_deltaSS_lala_thisEvt;
 
+  TProfile* p_v2_lambda_sumPt_thisEvt;
+  TProfile* p_v2_proton_sumPt_thisEvt;
+  TProfile* p_v2_lambda_etaGap_thisEvt;
+  TProfile* p_v2_proton_etaGap_thisEvt;
+  TProfile* p_deltaOS_sumPt_thisCent_thisEvt;
+  TProfile* p_deltaSS_sumPt_thisCent_thisEvt;
+  TProfile* p_gammaOS_sumPt_thisCent_thisEvt;
+  TProfile* p_gammaSS_sumPt_thisCent_thisEvt;
+  TProfile* p_deltaOS_etaGap_thisCent_thisEvt;
+  TProfile* p_deltaSS_etaGap_thisCent_thisEvt;
+  TProfile* p_gammaOS_etaGap_thisCent_thisEvt;
+  TProfile* p_gammaSS_etaGap_thisCent_thisEvt;
+  TProfile* p_deltaOS_v2_lambda_thisEvt;
+  TProfile* p_deltaSS_v2_lambda_thisEvt;
+  TProfile* p_gammaOS_v2_lambda_thisEvt;
+  TProfile* p_gammaSS_v2_lambda_thisEvt;
+  TProfile* p_deltaOS_v2_proton_thisEvt;
+  TProfile* p_deltaSS_v2_proton_thisEvt;
+  TProfile* p_gammaOS_v2_proton_thisEvt;
+  TProfile* p_gammaSS_v2_proton_thisEvt;
 
 public:
   Event(float TScale , float BetaScale , float Rho2Scale , float Centrality);
@@ -94,6 +114,27 @@ public:
   array<TProfile* , 3> GetDeltaSSThisEvtSumPt() { return arr_p_deltaSS_sumPt_thisEvt; }
   array<TProfile* , 3> GetGammaOSThisEvtSumPt() { return arr_p_gammaOS_sumPt_thisEvt; }
   array<TProfile* , 3> GetGammaSSThisEvtSumPt() { return arr_p_gammaSS_sumPt_thisEvt; }
+
+  TProfile* GetV2LambdaSumPt() { return p_v2_lambda_sumPt_thisEvt; }
+  TProfile* GetV2ProtonSumPt() { return p_v2_proton_sumPt_thisEvt; }
+  TProfile* GetV2LambdaEtaGap() { return p_v2_lambda_etaGap_thisEvt; }
+  TProfile* GetV2ProtonEtaGap() { return p_v2_proton_etaGap_thisEvt; }
+  TProfile* GetDeltaOSSumPtThisCent() { return p_deltaOS_sumPt_thisCent_thisEvt; }
+  TProfile* GetDeltaSSSumPtThisCent() { return p_deltaSS_sumPt_thisCent_thisEvt; }
+  TProfile* GetGammaOSSumPtThisCent() { return p_gammaOS_sumPt_thisCent_thisEvt; }
+  TProfile* GetGammaSSSumPtThisCent() { return p_gammaSS_sumPt_thisCent_thisEvt; }
+  TProfile* GetDeltaOSEtaGapThisCent() { return p_deltaOS_etaGap_thisCent_thisEvt; }
+  TProfile* GetDeltaSSEtaGapThisCent() { return p_deltaSS_etaGap_thisCent_thisEvt; }
+  TProfile* GetGammaOSEtaGapThisCent() { return p_gammaOS_etaGap_thisCent_thisEvt; }
+  TProfile* GetGammaSSEtaGapThisCent() { return p_gammaSS_etaGap_thisCent_thisEvt; }
+  TProfile* GetDeltaOSV2Lambda() { return p_deltaOS_v2_lambda_thisEvt; }
+  TProfile* GetDeltaSSV2Lambda() { return p_deltaSS_v2_lambda_thisEvt; }
+  TProfile* GetGammaOSV2Lambda() { return p_gammaOS_v2_lambda_thisEvt; }
+  TProfile* GetGammaSSV2Lambda() { return p_gammaSS_v2_lambda_thisEvt; }
+  TProfile* GetDeltaOSV2Proton() { return p_deltaOS_v2_proton_thisEvt; }
+  TProfile* GetDeltaSSV2Proton() { return p_deltaSS_v2_proton_thisEvt; }
+  TProfile* GetGammaOSV2Proton() { return p_gammaOS_v2_proton_thisEvt; }
+  TProfile* GetGammaSSV2Proton() { return p_gammaSS_v2_proton_thisEvt; }
 };
 
 
@@ -127,6 +168,27 @@ Event::~Event()
     delete arr_p_gammaSS_sumPt_thisEvt[i];
   }
 
+  delete p_v2_lambda_sumPt_thisEvt;
+  delete p_v2_proton_sumPt_thisEvt;
+  delete p_v2_lambda_etaGap_thisEvt;
+  delete p_v2_proton_etaGap_thisEvt;
+  delete p_deltaOS_sumPt_thisCent_thisEvt;
+  delete p_deltaSS_sumPt_thisCent_thisEvt;
+  delete p_gammaOS_sumPt_thisCent_thisEvt;
+  delete p_gammaSS_sumPt_thisCent_thisEvt;
+  delete p_deltaOS_etaGap_thisCent_thisEvt;
+  delete p_deltaSS_etaGap_thisCent_thisEvt;
+  delete p_gammaOS_etaGap_thisCent_thisEvt;
+  delete p_gammaSS_etaGap_thisCent_thisEvt;
+  delete p_deltaOS_v2_lambda_thisEvt;
+  delete p_deltaSS_v2_lambda_thisEvt;
+  delete p_gammaOS_v2_lambda_thisEvt;
+  delete p_gammaSS_v2_lambda_thisEvt;
+  delete p_deltaOS_v2_proton_thisEvt;
+  delete p_deltaSS_v2_proton_thisEvt;
+  delete p_gammaOS_v2_proton_thisEvt;
+  delete p_gammaSS_v2_proton_thisEvt;
+
   h_pt_lambda_thisEvt = nullptr;
   h_pt_proton_thisEvt = nullptr;
   p_v2_pt_lambda_thisEvt = nullptr;
@@ -147,6 +209,27 @@ Event::~Event()
     arr_p_gammaOS_sumPt_thisEvt[i] = nullptr;
     arr_p_gammaSS_sumPt_thisEvt[i] = nullptr;
   }
+
+  p_v2_lambda_sumPt_thisEvt = nullptr;
+  p_v2_proton_sumPt_thisEvt = nullptr;
+  p_v2_lambda_etaGap_thisEvt = nullptr;
+  p_v2_proton_etaGap_thisEvt = nullptr;
+  p_deltaOS_sumPt_thisCent_thisEvt = nullptr;
+  p_deltaSS_sumPt_thisCent_thisEvt = nullptr;
+  p_gammaOS_sumPt_thisCent_thisEvt = nullptr;
+  p_gammaSS_sumPt_thisCent_thisEvt = nullptr;
+  p_deltaOS_etaGap_thisCent_thisEvt = nullptr;
+  p_deltaSS_etaGap_thisCent_thisEvt = nullptr;
+  p_gammaOS_etaGap_thisCent_thisEvt = nullptr;
+  p_gammaSS_etaGap_thisCent_thisEvt = nullptr;
+  p_deltaOS_v2_lambda_thisEvt = nullptr;
+  p_deltaSS_v2_lambda_thisEvt = nullptr;
+  p_gammaOS_v2_lambda_thisEvt = nullptr;
+  p_gammaSS_v2_lambda_thisEvt = nullptr;
+  p_deltaOS_v2_proton_thisEvt = nullptr;
+  p_deltaSS_v2_proton_thisEvt = nullptr;
+  p_gammaOS_v2_proton_thisEvt = nullptr;
+  p_gammaSS_v2_proton_thisEvt = nullptr;
 }
 
 void Event::GenerateParticles()
@@ -244,6 +327,27 @@ void Event::CaluculateObservables()
     arr_p_gammaSS_sumPt_thisEvt[i] = new TProfile("" , "" , 7 , 0 , 70);
   }
 
+  p_v2_lambda_sumPt_thisEvt = new TProfile("", "", 40, 0, 10);
+  p_v2_proton_sumPt_thisEvt = new TProfile("", "", 40, 0, 10);
+  p_v2_lambda_etaGap_thisEvt = new TProfile("", "", 40, 0., 1.6);
+  p_v2_proton_etaGap_thisEvt = new TProfile("", "", 40, 0., 1.6);
+  p_deltaOS_sumPt_thisCent_thisEvt = new TProfile("", "", 40, 0, 10);
+  p_deltaSS_sumPt_thisCent_thisEvt = new TProfile("", "", 40, 0, 10);
+  p_gammaOS_sumPt_thisCent_thisEvt = new TProfile("", "", 40, 0, 10);
+  p_gammaSS_sumPt_thisCent_thisEvt = new TProfile("", "", 40, 0, 10);
+  p_deltaOS_etaGap_thisCent_thisEvt = new TProfile("", "", 40, 0., 1.6);
+  p_deltaSS_etaGap_thisCent_thisEvt = new TProfile("", "", 40, 0., 1.6);
+  p_gammaOS_etaGap_thisCent_thisEvt = new TProfile("", "", 40, 0., 1.6);
+  p_gammaSS_etaGap_thisCent_thisEvt = new TProfile("", "", 40, 0., 1.6);
+  p_deltaOS_v2_lambda_thisEvt = new TProfile("", "", 40, 0, 0.4);
+  p_deltaSS_v2_lambda_thisEvt = new TProfile("", "", 40, 0, 0.4);
+  p_gammaOS_v2_lambda_thisEvt = new TProfile("", "", 40, 0, 0.4);
+  p_gammaSS_v2_lambda_thisEvt = new TProfile("", "", 40, 0, 0.4);
+  p_deltaOS_v2_proton_thisEvt = new TProfile("", "", 40, 0, 0.4);
+  p_deltaSS_v2_proton_thisEvt = new TProfile("", "", 40, 0, 0.4);
+  p_gammaOS_v2_proton_thisEvt = new TProfile("", "", 40, 0, 0.4);
+  p_gammaSS_v2_proton_thisEvt = new TProfile("", "", 40, 0, 0.4);
+
   for (const auto& particle_1 : vecParticles) {
     // 舍去Lambda的y大于0.5,pT小于0.5大于10的情况
     if (abs(particle_1->GetPid()) == 3122) {
@@ -260,17 +364,18 @@ void Event::CaluculateObservables()
 
     double pt_1 = particle_1->GetMomentum().Pt();
     double phi_1 = particle_1->GetMomentum().Phi();
-    double v2 = cos(2 * phi_1);
+    double eta_1 = particle_1->GetMomentum().PseudoRapidity();
+    double v2_1 = cos(2 * phi_1);
 
     if (abs(particle_1->GetPid()) == 3122) {
       // 谱只取|y|<0.5，pT>0.6的Lambda
       if (particle_1->GetMomentum().Pt() > 0.6) h_pt_lambda_thisEvt->Fill(pt_1);
-      p_v2_pt_lambda_thisEvt->Fill(pt_1 , v2);
+      p_v2_pt_lambda_thisEvt->Fill(pt_1 , v2_1);
     }
     else if (abs(particle_1->GetPid()) == 2212) {
       // 谱只取|y|<0.5的质子
       if (abs(particle_1->GetMomentum().Rapidity()) < 0.5) h_pt_proton_thisEvt->Fill(pt_1);
-      p_v2_pt_proton_thisEvt->Fill(pt_1 , v2);
+      p_v2_pt_proton_thisEvt->Fill(pt_1 , v2_1);
     }
 
     // gamma and delta
@@ -293,10 +398,15 @@ void Event::CaluculateObservables()
         if (particle_2->GetMomentum().Pt() > 5) continue;
       }
 
+      double pt_2 = particle_2->GetMomentum().Pt();
       double phi_2 = particle_2->GetMomentum().Phi();
+      double eta_2 = particle_2->GetMomentum().PseudoRapidity();
+
       double gamma = cos(phi_1 + phi_2);
       double delta = cos(phi_1 - phi_2);
-      double eta_gap = abs(particle_1->GetMomentum().PseudoRapidity() - particle_2->GetMomentum().PseudoRapidity());
+      double eta_gap = abs(eta_1 - eta_2);
+      double sumPt = pt_1 + pt_2;
+
       TBits bits(4);
       bits[0] = eta_gap > 0.2;
       bits[1] = eta_gap > 0.4;
@@ -304,14 +414,19 @@ void Event::CaluculateObservables()
       bits[3] = eta_gap > 0.8;
 
       TBits bits_sumPt(3);
-      bits_sumPt[0] = particle_1->GetMomentum().Pt() + particle_2->GetMomentum().Pt() > 1 && particle_1->GetMomentum().Pt() + particle_2->GetMomentum().Pt() < 3;
-      bits_sumPt[1] = particle_1->GetMomentum().Pt() + particle_2->GetMomentum().Pt() > 3 && particle_1->GetMomentum().Pt() + particle_2->GetMomentum().Pt() < 5;
-      bits_sumPt[2] = particle_1->GetMomentum().Pt() + particle_2->GetMomentum().Pt() > 5 && particle_1->GetMomentum().Pt() + particle_2->GetMomentum().Pt() < 8;
+      bits_sumPt[0] = sumPt > 1. && sumPt < 3.;
+      bits_sumPt[1] = sumPt > 3. && sumPt < 5.;
+      bits_sumPt[2] = sumPt > 5. && sumPt < 8.;
 
       //当pid同号时，认为是SS，反之认为是OS
       if (particle_1->GetPid() * particle_2->GetPid() > 0) {
         p_gammaSS_thisEvt->Fill(fCentrality , gamma);
         p_deltaSS_thisEvt->Fill(fCentrality , delta);
+        p_deltaSS_etaGap_thisCent_thisEvt->Fill(eta_gap , delta);
+        p_gammaSS_etaGap_thisCent_thisEvt->Fill(eta_gap , gamma);
+        p_deltaSS_sumPt_thisCent_thisEvt->Fill(sumPt , delta);
+        p_gammaSS_sumPt_thisCent_thisEvt->Fill(sumPt , gamma);
+
         for (int i = 0; i < 4; i++) {
           if (bits[i]) {
             arr_p_gammaSS_etaGap_thisEvt[i]->Fill(fCentrality , gamma);
@@ -324,9 +439,26 @@ void Event::CaluculateObservables()
             arr_p_deltaSS_sumPt_thisEvt[i]->Fill(fCentrality , delta);
           }
         }
+
+        if (abs(particle_1->GetPid()) == 3122) {
+          p_v2_lambda_sumPt_thisEvt->Fill(sumPt , v2_1);
+          p_v2_lambda_etaGap_thisEvt->Fill(eta_gap , v2_1);
+          p_deltaSS_v2_lambda_thisEvt->Fill(v2_1 , delta);
+          p_gammaSS_v2_lambda_thisEvt->Fill(v2_1 , gamma);
+        } else if (abs(particle_1->GetPid()) == 2212) {
+          p_v2_proton_sumPt_thisEvt->Fill(sumPt , v2_1);
+          p_v2_proton_etaGap_thisEvt->Fill(eta_gap , v2_1);
+          p_deltaSS_v2_proton_thisEvt->Fill(v2_1 , delta);
+          p_gammaSS_v2_proton_thisEvt->Fill(v2_1 , gamma);
+        }
       } else {
         p_gammaOS_thisEvt->Fill(fCentrality , gamma);
         p_deltaOS_thisEvt->Fill(fCentrality , delta);
+        p_deltaOS_etaGap_thisCent_thisEvt->Fill(eta_gap , delta);
+        p_gammaOS_etaGap_thisCent_thisEvt->Fill(eta_gap , gamma);
+        p_deltaOS_sumPt_thisCent_thisEvt->Fill(sumPt , delta);
+        p_gammaOS_sumPt_thisCent_thisEvt->Fill(sumPt , gamma);
+
         for (int i = 0; i < 4; i++) {
           if (bits[i]) {
             arr_p_gammaOS_etaGap_thisEvt[i]->Fill(fCentrality , gamma);
@@ -338,6 +470,22 @@ void Event::CaluculateObservables()
             arr_p_gammaOS_sumPt_thisEvt[i]->Fill(fCentrality , gamma);
             arr_p_deltaOS_sumPt_thisEvt[i]->Fill(fCentrality , delta);
           }
+        }
+
+        if (abs(particle_1->GetPid()) == 3122) {
+          p_deltaOS_etaGap_thisCent_thisEvt->Fill(eta_gap , delta);
+          p_gammaOS_etaGap_thisCent_thisEvt->Fill(eta_gap , gamma);
+          p_deltaOS_sumPt_thisCent_thisEvt->Fill(sumPt , delta);
+          p_gammaOS_sumPt_thisCent_thisEvt->Fill(sumPt , gamma);
+          p_deltaOS_v2_lambda_thisEvt->Fill(v2_1 , delta);
+          p_gammaOS_v2_lambda_thisEvt->Fill(v2_1 , gamma);
+        } else if (abs(particle_1->GetPid()) == 2212) {
+          p_deltaOS_etaGap_thisCent_thisEvt->Fill(eta_gap , delta);
+          p_gammaOS_etaGap_thisCent_thisEvt->Fill(eta_gap , gamma);
+          p_deltaOS_sumPt_thisCent_thisEvt->Fill(sumPt , delta);
+          p_gammaOS_sumPt_thisCent_thisEvt->Fill(sumPt , gamma);
+          p_deltaOS_v2_proton_thisEvt->Fill(v2_1 , delta);
+          p_gammaOS_v2_proton_thisEvt->Fill(v2_1 , gamma);
         }
       }
     }

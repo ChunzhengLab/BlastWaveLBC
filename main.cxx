@@ -76,7 +76,8 @@ int main(int argc, char* argv[]) {
   const float fCentrality = std::stof(argv[1]);
   const float fTScale = TScale;
   const float fBetaScale = BetaScale;
-  const float fRho2Scale = Rho2Scale;
+  //fRho2Scale 在Rho2Scale 的 0.5 ~ 1.5 之间晃动
+  float fRho2Scale = Rho2Scale * (0.5 + 0.5 * gRandom->Rndm());
   float fLBC = 0.0;
   int cent_ = (int) fCentrality;
   //cent_ = 25 -> fLBC = FracLBC[0], cent_ = 35 -> fLBC = FracLBC[1], cent_ = 45 -> fLBC = FracLBC[2], 
@@ -122,6 +123,27 @@ int main(int argc, char* argv[]) {
     p_gammaSS_sumPt[i] = new TProfile(Form("p_gammaSS_sumPt_%f_%f", sumPtMin[i], sumPtMax[i]), Form("p_deltaOS_sumPt_%f_%f", sumPtMin[i], sumPtMax[i]), 7, 0, 70);
   }
 
+  TProfile* p_v2_lambda_sumPt = new TProfile("p_v2_sumPt_lambda", "p_v2_sumPt_lambda", 40, 0, 10);
+  TProfile* p_v2_proton_sumPt = new TProfile("p_v2_sumPt_proton", "p_v2_sumPt_proton", 40, 0, 10);
+  TProfile* p_v2_lambda_etaGap = new TProfile("p_v2_etaGap_lambda", "p_v2_etaGap_lambda", 40, 0., 1.6);
+  TProfile* p_v2_proton_etaGap = new TProfile("p_v2_etaGap_proton", "p_v2_etaGap_proton", 40, 0., 1.6);
+  TProfile* p_deltaOS_sumPt_thisCent = new TProfile("p_deltaOS_sumPt_thisCent", "p_deltaOS_sumPt_thisCent", 40, 0, 10);
+  TProfile* p_deltaSS_sumPt_thisCent = new TProfile("p_deltaSS_sumPt_thisCent", "p_deltaSS_sumPt_thisCent", 40, 0, 10);
+  TProfile* p_gammaOS_sumPt_thisCent = new TProfile("p_gammaOS_sumPt_thisCent", "p_gammaOS_sumPt_thisCent", 40, 0, 10);
+  TProfile* p_gammaSS_sumPt_thisCent = new TProfile("p_gammaSS_sumPt_thisCent", "p_gammaSS_sumPt_thisCent", 40, 0, 10);
+  TProfile* p_deltaOS_etaGap_thisCent = new TProfile("p_deltaOS_etaGap_thisCent", "p_deltaOS_etaGap_thisCent", 40, 0., 1.6);
+  TProfile* p_deltaSS_etaGap_thisCent = new TProfile("p_deltaSS_etaGap_thisCent", "p_deltaSS_etaGap_thisCent", 40, 0., 1.6);
+  TProfile* p_gammaOS_etaGap_thisCent = new TProfile("p_gammaOS_etaGap_thisCent", "p_gammaOS_etaGap_thisCent", 40, 0., 1.6);
+  TProfile* p_gammaSS_etaGap_thisCent = new TProfile("p_gammaSS_etaGap_thisCent", "p_gammaSS_etaGap_thisCent", 40, 0., 1.6);
+  TProfile* p_deltaOS_v2_lambda = new TProfile("p_deltaOS_v2_lambda", "p_deltaOS_v2_lambda", 40, 0, 0.4);
+  TProfile* p_deltaSS_v2_lambda = new TProfile("p_deltaSS_v2_lambda", "p_deltaSS_v2_lambda", 40, 0, 0.4);
+  TProfile* p_gammaOS_v2_lambda = new TProfile("p_gammaOS_v2_lambda", "p_gammaOS_v2_lambda", 40, 0, 0.4);
+  TProfile* p_gammaSS_v2_lambda = new TProfile("p_gammaSS_v2_lambda", "p_gammaSS_v2_lambda", 40, 0, 0.4);
+  TProfile* p_deltaOS_v2_proton = new TProfile("p_deltaOS_v2_proton", "p_deltaOS_v2_proton", 40, 0, 0.4);
+  TProfile* p_deltaSS_v2_proton = new TProfile("p_deltaSS_v2_proton", "p_deltaSS_v2_proton", 40, 0, 0.4);
+  TProfile* p_gammaOS_v2_proton = new TProfile("p_gammaOS_v2_proton", "p_gammaOS_v2_proton", 40, 0, 0.4);
+  TProfile* p_gammaSS_v2_proton = new TProfile("p_gammaSS_v2_proton", "p_gammaSS_v2_proton", 40, 0, 0.4);
+
   if (isDebug) cout<<"Start generating events..."<<endl;
   for (unsigned int iEvent = 0; iEvent < nEvents; iEvent++) {
     //显示生成进度，每100个事件显示一次
@@ -165,6 +187,27 @@ int main(int argc, char* argv[]) {
       p_deltaOS_sumPt[i]->Add(event->GetDeltaOSThisEvtSumPt()[i]);
     }
 
+    p_v2_lambda_sumPt -> Add(event->GetV2LambdaSumPt());
+    p_v2_proton_sumPt ->Add(event->GetV2ProtonSumPt());
+    p_v2_lambda_etaGap ->Add(event->GetV2LambdaEtaGap());
+    p_v2_proton_etaGap ->Add(event->GetV2ProtonEtaGap());
+    p_deltaOS_sumPt_thisCent ->Add(event->GetDeltaOSSumPtThisCent());
+    p_deltaSS_sumPt_thisCent ->Add(event->GetDeltaSSSumPtThisCent());
+    p_gammaOS_sumPt_thisCent ->Add(event->GetGammaOSSumPtThisCent());
+    p_gammaSS_sumPt_thisCent ->Add(event->GetGammaSSSumPtThisCent());
+    p_deltaOS_etaGap_thisCent ->Add(event->GetDeltaOSEtaGapThisCent());
+    p_deltaSS_etaGap_thisCent ->Add(event->GetDeltaSSEtaGapThisCent());
+    p_gammaOS_etaGap_thisCent ->Add(event->GetGammaOSEtaGapThisCent());
+    p_gammaSS_etaGap_thisCent ->Add(event->GetGammaSSEtaGapThisCent());
+    p_deltaOS_v2_lambda ->Add(event->GetDeltaOSV2Lambda());
+    p_deltaSS_v2_lambda ->Add(event->GetDeltaSSV2Lambda());
+    p_gammaOS_v2_lambda ->Add(event->GetGammaOSV2Lambda());
+    p_gammaSS_v2_lambda ->Add(event->GetGammaSSV2Lambda());
+    p_deltaOS_v2_proton ->Add(event->GetDeltaOSV2Proton());
+    p_deltaSS_v2_proton ->Add(event->GetDeltaSSV2Proton());
+    p_gammaOS_v2_proton ->Add(event->GetGammaOSV2Proton());
+    p_gammaSS_v2_proton ->Add(event->GetGammaSSV2Proton());
+
     delete event;
     event = nullptr;
   }
@@ -190,6 +233,27 @@ int main(int argc, char* argv[]) {
     p_deltaSS_sumPt[i]->Write();
     p_deltaOS_sumPt[i]->Write();
   }
+  p_v2_lambda_sumPt -> Write();
+  p_v2_proton_sumPt -> Write();
+  p_v2_lambda_etaGap -> Write();
+  p_v2_proton_etaGap -> Write();
+  p_deltaOS_sumPt_thisCent -> Write();
+  p_deltaSS_sumPt_thisCent -> Write();
+  p_gammaOS_sumPt_thisCent -> Write();
+  p_gammaSS_sumPt_thisCent -> Write();
+  p_deltaOS_etaGap_thisCent -> Write();
+  p_deltaSS_etaGap_thisCent -> Write();
+  p_gammaOS_etaGap_thisCent -> Write();
+  p_gammaSS_etaGap_thisCent -> Write();
+  p_deltaOS_v2_lambda -> Write();
+  p_deltaSS_v2_lambda -> Write();
+  p_gammaOS_v2_lambda -> Write();
+  p_gammaSS_v2_lambda -> Write();
+  p_deltaOS_v2_proton -> Write();
+  p_deltaSS_v2_proton -> Write();
+  p_gammaOS_v2_proton -> Write();
+  p_gammaSS_v2_proton -> Write();
+
   f->Close();
   //cout << "Generating event TScale = " << fTScale << ", BetaScale = " << fBetaScale << ", Rho2Scale = " << fRho2Scale << ", Centrality = " << fCentrality << " finished." << endl;
   //cout << "Generating event fLBC = " << fLBC << ", Centrality = " << fCentrality << " finished." << endl;
