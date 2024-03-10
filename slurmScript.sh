@@ -6,4 +6,4 @@
 #SBATCH --nodes=1
 #SBATCH --output=output.log
 
-srun ./commands0.sh $SLURM_ARRAY_TASK_ID
+srun ./commands.sh $SLURM_ARRAY_TASK_ID
