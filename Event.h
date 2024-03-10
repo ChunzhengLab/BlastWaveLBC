@@ -25,6 +25,13 @@ private:
   unsigned int multiplicity;
   float fRejectionFactor;
 
+  bool isV2Calculated;
+  float v2_thisEvt;
+  float v2_lambda_thisEvt;
+  float v2_proton_thisEvt;
+  unsigned int nLambda;
+  unsigned int nProton;
+
   //用于生成Particle in this Event
   void SeedEmissionPoint(float& x , float& y);
   TVector3 GetBoostVector(const TVector2& xy);
@@ -34,6 +41,7 @@ private:
   vector<unique_ptr<Particle>> vecParticles;
   void Reserve(size_t size) { vecParticles.reserve(size); }
   void AddParticle(unique_ptr<Particle> p) { vecParticles.emplace_back(std::move(p)); }
+  void CaluculateV2ThisEvt();
 
   //用于存储每个Event的观测量
   TH1D* h_pt_lambda_thisEvt;
@@ -92,9 +100,16 @@ public:
   void SetMultiplicity(unsigned int multiplicity) { this->multiplicity = multiplicity; }
   void SetfLBC(float flbc) { fRejectionFactor = flbc * (2. - flbc); }
 
-  void GenerateParticles();
+  bool GenerateParticles();
   void CaluculateObservables();
   void Print();
+
+  void GetV2ThisEvt(float& v2, float& v2_lambda, float& v2_proton) { //should be very slow
+    if(!isV2Calculated) CaluculateV2ThisEvt();
+    v2 = v2_thisEvt; 
+    v2_lambda = v2_lambda_thisEvt; 
+    v2_proton = v2_proton_thisEvt; 
+  }
 
   TH1D* GetPtLambdaThisEvt() { return h_pt_lambda_thisEvt; }
   TH1D* GetPtProtonThisEvt() { return h_pt_proton_thisEvt; }
@@ -232,8 +247,9 @@ Event::~Event()
   p_gammaSS_v2_proton_thisEvt = nullptr;
 }
 
-void Event::GenerateParticles()
+bool Event::GenerateParticles()
 {
+  nLambda = 0, nProton = 0;
   Reserve(multiplicity);
   unsigned int iSerialNumber = 0;
   //当iSerialNumber大于multiplicity时，停止循环
@@ -274,8 +290,12 @@ void Event::GenerateParticles()
       particle->SetSerialNumberLBCFriend(iSerialNumber);
     }
     particle->BuildParticle();
+    if (particle->GetPid() == 3122) nLambda++;
+    if (particle->GetPid() == 2212) nProton++;
     AddParticle(unique_ptr<Particle>(particle));
   }
+  if (nLambda == 0 || nProton == 0) return false;
+  return true;
 }
 
 void Event::SeedEmissionPoint(float& x , float& y)
@@ -304,6 +324,14 @@ int Event::GivePidBasedOnRatio(float ratio)
 
 void Event::CaluculateObservables()
 {
+  if(!isV2Calculated) CaluculateV2ThisEvt();
+  float deltaSS_thisEvt = 0;
+  float deltaOS_thisEvt = 0;
+  float gammaSS_thisEvt = 0;
+  float gammaOS_thisEvt = 0;
+  int nSSLoop = 0;
+  int nOSLoop = 0;
+
   h_pt_lambda_thisEvt = new TH1D("h_pt_lambda_thisEvt" , "h_pt_lambda_thisEvt" , nPtBins , PtHistMin , PtHistMax);
   h_pt_proton_thisEvt = new TH1D("h_pt_proton_thisEvt" , "h_pt_proton_thisEvt" , nPtBins , PtHistMin , PtHistMax);
   p_v2_pt_lambda_thisEvt = new TProfile("p_v2_pt_lambda_thisEvt" , "p_v2_pt_lambda_thisEvt" , nV2Bins , V2HistMin , V2HistMax);
@@ -339,14 +367,14 @@ void Event::CaluculateObservables()
   p_deltaSS_etaGap_thisCent_thisEvt = new TProfile("", "", 40, 0., 1.6);
   p_gammaOS_etaGap_thisCent_thisEvt = new TProfile("", "", 40, 0., 1.6);
   p_gammaSS_etaGap_thisCent_thisEvt = new TProfile("", "", 40, 0., 1.6);
-  p_deltaOS_v2_lambda_thisEvt = new TProfile("", "", 40, 0, 0.4);
-  p_deltaSS_v2_lambda_thisEvt = new TProfile("", "", 40, 0, 0.4);
-  p_gammaOS_v2_lambda_thisEvt = new TProfile("", "", 40, 0, 0.4);
-  p_gammaSS_v2_lambda_thisEvt = new TProfile("", "", 40, 0, 0.4);
-  p_deltaOS_v2_proton_thisEvt = new TProfile("", "", 40, 0, 0.4);
-  p_deltaSS_v2_proton_thisEvt = new TProfile("", "", 40, 0, 0.4);
-  p_gammaOS_v2_proton_thisEvt = new TProfile("", "", 40, 0, 0.4);
-  p_gammaSS_v2_proton_thisEvt = new TProfile("", "", 40, 0, 0.4);
+  p_deltaOS_v2_lambda_thisEvt = new TProfile("", "", 100, 0, 1);
+  p_deltaSS_v2_lambda_thisEvt = new TProfile("", "", 100, 0, 1);
+  p_gammaOS_v2_lambda_thisEvt = new TProfile("", "", 100, 0, 1);
+  p_gammaSS_v2_lambda_thisEvt = new TProfile("", "", 100, 0, 1);
+  p_deltaOS_v2_proton_thisEvt = new TProfile("", "", 100, 0, 1);
+  p_deltaSS_v2_proton_thisEvt = new TProfile("", "", 100, 0, 1);
+  p_gammaOS_v2_proton_thisEvt = new TProfile("", "", 100, 0, 1);
+  p_gammaSS_v2_proton_thisEvt = new TProfile("", "", 100, 0, 1);
 
   for (const auto& particle_1 : vecParticles) {
     // 舍去Lambda的y大于0.5,pT小于0.5大于10的情况
@@ -362,10 +390,10 @@ void Event::CaluculateObservables()
       if (particle_1->GetMomentum().Pt() > 5) continue;
     }
 
-    double pt_1 = particle_1->GetMomentum().Pt();
-    double phi_1 = particle_1->GetMomentum().Phi();
-    double eta_1 = particle_1->GetMomentum().PseudoRapidity();
-    double v2_1 = cos(2 * phi_1);
+    float pt_1 = particle_1->GetMomentum().Pt();
+    float phi_1 = particle_1->GetMomentum().Phi();
+    float eta_1 = particle_1->GetMomentum().PseudoRapidity();
+    float v2_1 = cos(2 * phi_1);
 
     if (abs(particle_1->GetPid()) == 3122) {
       // 谱只取|y|<0.5，pT>0.6的Lambda
@@ -398,14 +426,14 @@ void Event::CaluculateObservables()
         if (particle_2->GetMomentum().Pt() > 5) continue;
       }
 
-      double pt_2 = particle_2->GetMomentum().Pt();
-      double phi_2 = particle_2->GetMomentum().Phi();
-      double eta_2 = particle_2->GetMomentum().PseudoRapidity();
+      float pt_2 = particle_2->GetMomentum().Pt();
+      float phi_2 = particle_2->GetMomentum().Phi();
+      float eta_2 = particle_2->GetMomentum().PseudoRapidity();
 
-      double gamma = cos(phi_1 + phi_2);
-      double delta = cos(phi_1 - phi_2);
-      double eta_gap = abs(eta_1 - eta_2);
-      double sumPt = pt_1 + pt_2;
+      float gamma = cos(phi_1 + phi_2);
+      float delta = cos(phi_1 - phi_2);
+      float eta_gap = abs(eta_1 - eta_2);
+      float sumPt = pt_1 + pt_2;
 
       TBits bits(4);
       bits[0] = eta_gap > 0.2;
@@ -426,6 +454,9 @@ void Event::CaluculateObservables()
         p_gammaSS_etaGap_thisCent_thisEvt->Fill(eta_gap , gamma);
         p_deltaSS_sumPt_thisCent_thisEvt->Fill(sumPt , delta);
         p_gammaSS_sumPt_thisCent_thisEvt->Fill(sumPt , gamma);
+        deltaSS_thisEvt += delta;
+        gammaSS_thisEvt += gamma;
+        nSSLoop++;
 
         for (int i = 0; i < 4; i++) {
           if (bits[i]) {
@@ -443,13 +474,9 @@ void Event::CaluculateObservables()
         if (abs(particle_1->GetPid()) == 3122) {
           p_v2_lambda_sumPt_thisEvt->Fill(sumPt , v2_1);
           p_v2_lambda_etaGap_thisEvt->Fill(eta_gap , v2_1);
-          p_deltaSS_v2_lambda_thisEvt->Fill(v2_1 , delta);
-          p_gammaSS_v2_lambda_thisEvt->Fill(v2_1 , gamma);
         } else if (abs(particle_1->GetPid()) == 2212) {
           p_v2_proton_sumPt_thisEvt->Fill(sumPt , v2_1);
           p_v2_proton_etaGap_thisEvt->Fill(eta_gap , v2_1);
-          p_deltaSS_v2_proton_thisEvt->Fill(v2_1 , delta);
-          p_gammaSS_v2_proton_thisEvt->Fill(v2_1 , gamma);
         }
       } else {
         p_gammaOS_thisEvt->Fill(fCentrality , gamma);
@@ -458,6 +485,9 @@ void Event::CaluculateObservables()
         p_gammaOS_etaGap_thisCent_thisEvt->Fill(eta_gap , gamma);
         p_deltaOS_sumPt_thisCent_thisEvt->Fill(sumPt , delta);
         p_gammaOS_sumPt_thisCent_thisEvt->Fill(sumPt , gamma);
+        deltaOS_thisEvt += delta;
+        gammaOS_thisEvt += gamma;
+        nOSLoop++;
 
         for (int i = 0; i < 4; i++) {
           if (bits[i]) {
@@ -477,18 +507,25 @@ void Event::CaluculateObservables()
           p_gammaOS_etaGap_thisCent_thisEvt->Fill(eta_gap , gamma);
           p_deltaOS_sumPt_thisCent_thisEvt->Fill(sumPt , delta);
           p_gammaOS_sumPt_thisCent_thisEvt->Fill(sumPt , gamma);
-          p_deltaOS_v2_lambda_thisEvt->Fill(v2_1 , delta);
-          p_gammaOS_v2_lambda_thisEvt->Fill(v2_1 , gamma);
         } else if (abs(particle_1->GetPid()) == 2212) {
           p_deltaOS_etaGap_thisCent_thisEvt->Fill(eta_gap , delta);
           p_gammaOS_etaGap_thisCent_thisEvt->Fill(eta_gap , gamma);
           p_deltaOS_sumPt_thisCent_thisEvt->Fill(sumPt , delta);
           p_gammaOS_sumPt_thisCent_thisEvt->Fill(sumPt , gamma);
-          p_deltaOS_v2_proton_thisEvt->Fill(v2_1 , delta);
-          p_gammaOS_v2_proton_thisEvt->Fill(v2_1 , gamma);
         }
       }
     }
+  }
+
+  if (nSSLoop > 1e-6 && nOSLoop > 1e-6) {
+    p_deltaSS_v2_lambda_thisEvt->Fill(v2_lambda_thisEvt , deltaSS_thisEvt / nSSLoop, nSSLoop);
+    p_gammaSS_v2_lambda_thisEvt->Fill(v2_lambda_thisEvt , gammaSS_thisEvt / nSSLoop, nSSLoop);
+    p_deltaSS_v2_proton_thisEvt->Fill(v2_proton_thisEvt , deltaSS_thisEvt / nSSLoop, nSSLoop);
+    p_gammaSS_v2_proton_thisEvt->Fill(v2_proton_thisEvt , gammaSS_thisEvt / nSSLoop, nSSLoop);
+    p_deltaOS_v2_lambda_thisEvt->Fill(v2_lambda_thisEvt , deltaOS_thisEvt / nOSLoop, nOSLoop);
+    p_gammaOS_v2_lambda_thisEvt->Fill(v2_lambda_thisEvt , gammaOS_thisEvt / nOSLoop, nOSLoop);
+    p_deltaOS_v2_proton_thisEvt->Fill(v2_proton_thisEvt , deltaOS_thisEvt / nOSLoop, nOSLoop);
+    p_gammaOS_v2_proton_thisEvt->Fill(v2_proton_thisEvt , gammaOS_thisEvt / nOSLoop, nOSLoop);
   }
 }
 
@@ -517,5 +554,33 @@ void Event::Print() {
   cout << "Event multiplicity: " << multiplicity << endl;
   cout << "LBC rejection factor: " << fRejectionFactor << endl;
   cout << "======================" << endl;
+}
+
+void Event::CaluculateV2ThisEvt() {
+  for(auto& particle : vecParticles) {
+    float v2 = cos(2 * particle->GetMomentum().Phi());
+    v2_thisEvt += v2;
+    if (abs(particle->GetPid()) == 3122) {
+      v2_lambda_thisEvt += v2;
+    }
+    if (abs(particle->GetPid()) == 2212) {
+      v2_proton_thisEvt += v2;
+    }
+  }
+
+  if (nLambda > 1e-6) v2_lambda_thisEvt /= nLambda;
+  else                v2_lambda_thisEvt = 0.;
+  if (nProton > 1e-6) v2_proton_thisEvt /= nProton;
+  else                v2_proton_thisEvt = 0.;
+  if (vecParticles.size() > 1e-6) v2_thisEvt /= vecParticles.size();
+  else                            v2_thisEvt = 0.;
+
+  if(isnan(v2_thisEvt) || isnan(v2_lambda_thisEvt) || isnan(v2_proton_thisEvt)
+   ||isinf(v2_thisEvt) || isinf(v2_lambda_thisEvt) || isinf(v2_proton_thisEvt)) {
+    //异常抛出
+    throw std::runtime_error("v2 is nan or inf");
+  }
+
+  isV2Calculated = true;
 }
 

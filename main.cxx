@@ -51,7 +51,6 @@ unsigned int GetMultNBD(float centrality) {
   //我们只生成Lambda和Proton，大概是总Multiplicity的8%
   multiplicity = multiplicity * ratioProtonInclusive * (1 + ratioProtonLambda) / ratioProtonLambda;
   if(isDebug) cout<<"multiplicity = "<<multiplicity<<endl;
-  if(isDebug) multiplicity = 100;
   return multiplicity;
 }
 
@@ -76,8 +75,7 @@ int main(int argc, char* argv[]) {
   const float fCentrality = std::stof(argv[1]);
   const float fTScale = TScale;
   const float fBetaScale = BetaScale;
-  //fRho2Scale 在Rho2Scale 的 0.5 ~ 1.5 之间晃动
-  float fRho2Scale = Rho2Scale * (0.5 + 0.5 * gRandom->Rndm());
+  float fRho2Scale = Rho2Scale;
   float fLBC = 0.0;
   int cent_ = (int) fCentrality;
   //cent_ = 25 -> fLBC = FracLBC[0], cent_ = 35 -> fLBC = FracLBC[1], cent_ = 45 -> fLBC = FracLBC[2], 
@@ -135,14 +133,14 @@ int main(int argc, char* argv[]) {
   TProfile* p_deltaSS_etaGap_thisCent = new TProfile("p_deltaSS_etaGap_thisCent", "p_deltaSS_etaGap_thisCent", 40, 0., 1.6);
   TProfile* p_gammaOS_etaGap_thisCent = new TProfile("p_gammaOS_etaGap_thisCent", "p_gammaOS_etaGap_thisCent", 40, 0., 1.6);
   TProfile* p_gammaSS_etaGap_thisCent = new TProfile("p_gammaSS_etaGap_thisCent", "p_gammaSS_etaGap_thisCent", 40, 0., 1.6);
-  TProfile* p_deltaOS_v2_lambda = new TProfile("p_deltaOS_v2_lambda", "p_deltaOS_v2_lambda", 40, 0, 0.4);
-  TProfile* p_deltaSS_v2_lambda = new TProfile("p_deltaSS_v2_lambda", "p_deltaSS_v2_lambda", 40, 0, 0.4);
-  TProfile* p_gammaOS_v2_lambda = new TProfile("p_gammaOS_v2_lambda", "p_gammaOS_v2_lambda", 40, 0, 0.4);
-  TProfile* p_gammaSS_v2_lambda = new TProfile("p_gammaSS_v2_lambda", "p_gammaSS_v2_lambda", 40, 0, 0.4);
-  TProfile* p_deltaOS_v2_proton = new TProfile("p_deltaOS_v2_proton", "p_deltaOS_v2_proton", 40, 0, 0.4);
-  TProfile* p_deltaSS_v2_proton = new TProfile("p_deltaSS_v2_proton", "p_deltaSS_v2_proton", 40, 0, 0.4);
-  TProfile* p_gammaOS_v2_proton = new TProfile("p_gammaOS_v2_proton", "p_gammaOS_v2_proton", 40, 0, 0.4);
-  TProfile* p_gammaSS_v2_proton = new TProfile("p_gammaSS_v2_proton", "p_gammaSS_v2_proton", 40, 0, 0.4);
+  TProfile* p_deltaOS_v2_lambda = new TProfile("p_deltaOS_v2_lambda", "p_deltaOS_v2_lambda", 100, 0, 1);
+  TProfile* p_deltaSS_v2_lambda = new TProfile("p_deltaSS_v2_lambda", "p_deltaSS_v2_lambda", 100, 0, 1);
+  TProfile* p_gammaOS_v2_lambda = new TProfile("p_gammaOS_v2_lambda", "p_gammaOS_v2_lambda", 100, 0, 1);
+  TProfile* p_gammaSS_v2_lambda = new TProfile("p_gammaSS_v2_lambda", "p_gammaSS_v2_lambda", 100, 0, 1);
+  TProfile* p_deltaOS_v2_proton = new TProfile("p_deltaOS_v2_proton", "p_deltaOS_v2_proton", 100, 0, 1);
+  TProfile* p_deltaSS_v2_proton = new TProfile("p_deltaSS_v2_proton", "p_deltaSS_v2_proton", 100, 0, 1);
+  TProfile* p_gammaOS_v2_proton = new TProfile("p_gammaOS_v2_proton", "p_gammaOS_v2_proton", 100, 0, 1);
+  TProfile* p_gammaSS_v2_proton = new TProfile("p_gammaSS_v2_proton", "p_gammaSS_v2_proton", 100, 0, 1);
 
   if (isDebug) cout<<"Start generating events..."<<endl;
   for (unsigned int iEvent = 0; iEvent < nEvents; iEvent++) {
@@ -150,7 +148,8 @@ int main(int argc, char* argv[]) {
     if (iEvent % 100 == 0) {
       cout << "Generating event " << iEvent << "..." << endl;
     }
-    Event* event = new Event(fTScale, fBetaScale, fRho2Scale, fCentrality);
+    //fRho2Scale 在Rho2Scale 的 0.5 ~ 1.5 之间晃动
+    Event* event = new Event(fTScale, fBetaScale, fRho2Scale * (0.5 + 0.5 * gRandom->Rndm()), fCentrality);
     unsigned int multiplicity = GetMultNBD(fCentrality);
     event->SetMultiplicity(multiplicity);
     event->SetfLBC(fLBC);
@@ -159,7 +158,12 @@ int main(int argc, char* argv[]) {
       event->Print();
     }
     if (isDebug) cout<<"start generating particles in this event"<<endl;
-    event->GenerateParticles();
+    if (!event->GenerateParticles()) {
+      cout << "Error: failed to generate particles in event " << iEvent << endl;
+      delete event;
+      event = nullptr;
+      continue;
+    }
     if (isDebug) cout<<"particles generated"<<endl;
 
     event->CaluculateObservables();
